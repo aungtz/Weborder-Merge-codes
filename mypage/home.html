@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../css/style.css" />
     <script src="../js/jquery-3.7.1.min.js"></script>
 </head>
-
 <body>
     <!-- header -->
     <div class="container-logo">
@@ -537,48 +536,7 @@
         </main>
     </div>
     <script>
-        function showTooltip(element) {
-            let tooltip = document.querySelector('.tooltip-box');
-            if (!tooltip) {
-                tooltip = document.createElement('div');
-                tooltip.classList.add('tooltip-box');
-                document.body.appendChild(tooltip);
-            }
-            tooltip.textContent = element.textContent.trim();
-            if (element.scrollWidth - element.clientWidth > 1) {
-                const rect = element.getBoundingClientRect();
-                tooltip.style.display = 'block';
-                tooltip.style.top = `${rect.top + window.scrollY + element.offsetHeight + 15}px`;
-                tooltip.style.left = `${rect.left + window.scrollX}px`;
-
-                let tooltipRect = tooltip.getBoundingClientRect();
-                const windowWidth = window.innerWidth;
-
-                if (tooltipRect.right > windowWidth) {
-                    let currentLeft = parseInt(tooltip.style.left) || 0;
-                    let newLeft = currentLeft - (tooltipRect.right - windowWidth) - 50;
-                    tooltip.style.left = `${newLeft}px`;
-
-                    tooltipRect = tooltip.getBoundingClientRect();
-
-                    let arrowLeft = rect.left - tooltipRect.left + element.offsetWidth / 4 - 15;
-                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
-                } else {
-                    let arrowLeft = element.offsetWidth / 4 - 15;
-                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
-                }
-            } else {
-                tooltip.style.display = 'none';
-            }
-        }
-
-        function hideTooltip() {
-            const tooltip = document.querySelector('.tooltip-box');
-            if (tooltip) {
-                tooltip.style.display = 'none';
-            }
-        }
-
+        
         $(document).ready(function () {
 
             $(".category-model-open").click(function () {

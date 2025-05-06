@@ -1,4 +1,3 @@
-
 let selectedCategories = []; // Global state
 let currentTooltip = null;
 
@@ -273,7 +272,6 @@ const kanaGroups = {
     "ワ": ["ワ", "ヲ", "ン"]
 };
 
-
 // Function to render brand sections grouped by kana
 function renderBrandGroups() {
     const container = document.getElementById("brandSectionsContainer");
@@ -432,9 +430,106 @@ $(document).ready(function () {
         });
     });
 
+    // Category Modal
+    $(".category-model-open").click(function () {
+        console.log("Category model open clicked");
+    $("#categoryModel").fadeIn(300); // 300ms animation
+    $("#CategoryOverlay").fadeIn(300); // 300ms animation
+    });     
+    
+       // Close the modal with fade out
+$("#closeBtn, #closeModalBtn").click(function () {
+    $("#categoryModel").fadeOut(300); // 300ms animation
+    $("#CategoryOverlay").fadeOut(300); // 300ms animation
+});
+$('#closeModal, #closeModalBtn').on('click', function () {
+    $('#overlay').fadeOut();
+    $('#newsModal').fadeOut();
 });
 
-// Category Script
+});
+
+function showTooltip(element) {
+    let tooltip = document.querySelector('.tooltip-box');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.classList.add('tooltip-box');
+        document.body.appendChild(tooltip);
+    }
+    tooltip.textContent = element.textContent.trim();
+    if (element.scrollWidth - element.clientWidth > 1) {
+        const rect = element.getBoundingClientRect();
+        tooltip.style.display = 'block';
+        tooltip.style.top = `${rect.top + window.scrollY + element.offsetHeight + 15}px`;
+        tooltip.style.left = `${rect.left + window.scrollX}px`;
+
+        let tooltipRect = tooltip.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+
+        if (tooltipRect.right > windowWidth) {
+            let currentLeft = parseInt(tooltip.style.left) || 0;
+            let newLeft = currentLeft - (tooltipRect.right - windowWidth) - 50;
+            tooltip.style.left = `${newLeft}px`;
+
+            tooltipRect = tooltip.getBoundingClientRect();
+
+            let arrowLeft = rect.left - tooltipRect.left + element.offsetWidth / 4 - 15;
+            tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+        } else {
+            let arrowLeft = element.offsetWidth / 4 - 15;
+            tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+        }
+    } else {
+        tooltip.style.display = 'none';
+    }
+}
+
+function hideTooltip() {
+    const tooltip = document.querySelector('.tooltip-box');
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
+}
+
+$(document).ready(function () {
+
+    // Highlight active navigation link
+    let currentPage = window.location.pathname.split("/").pop();
+    $(".nav-list .nav-link").removeClass("active-nav");
+    $('.nav-list .nav-link[href="./' + currentPage + '"]').addClass("active-nav");
+});
+
+function switchTab(tabNumber) {
+    $('.nav-link').removeClass('active');
+    $(`#tab${tabNumber}-btn`).addClass('active');
+
+    $('.tab-pane').removeClass('show active');
+    $(`#tab${tabNumber}`).addClass('show active');
+}
+
+window.showPopup = function (title, content) {
+
+    var event = window.event;
+    var clickedElement = event.target;
+    var row = clickedElement.closest('tr');
+
+    var date = row.querySelector('#news-date').textContent;
+    var time = row.querySelector('#news-time').textContent;
+
+    document.querySelector('.modal-body .date').textContent = date;
+    document.querySelector('.modal-body .time').textContent = time;
+
+
+    $('.modal-news-title').text(title);
+    $('#popup-content').html(content);
+
+    setTimeout(function () {
+        document.getElementById('popup-content').scrollTop = 0;
+    }, 10);
+
+    $('#overlay').fadeIn();
+    $('#newsModal').fadeIn();
+}; 
 
 let categoryGrid = document.querySelector(".category-grid");
 categoryGrid.innerHTML = ""; // Clear previous rows
@@ -613,3 +708,5 @@ checkbox.addEventListener('change', function () {
     updateSelectedCategoriesDisplay();
 });
 updateSelectedCategoriesDisplay();
+
+  
