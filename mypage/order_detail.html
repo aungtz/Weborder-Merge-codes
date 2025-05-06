@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Web発注システム</title>
+    <link rel="icon" type="image/png" href="../images/sitelogo.png" />
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/order_detail.css" />
+    <script src="../js/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+    <!-- header -->
+    <div class="container-logo">
+        <nav class="nav-logo">
+            <img src="../images/tennic-logo.png" alt="Logo" />
+        </nav>
+
+        <nav class="navbar-50">
+            <span class="text-white">スポーツハウス アローザ </span>
+        </nav>
+    </div>
+
+    <div class="main-container">
+        <!-- left menu -->
+        <aside>
+            <div class="container mt-2 position-relative ">
+                <button class="btn btn-primary mb-4 d-flex justify-content-between align-items-center rounded-0"
+                    onclick="location.href='./order_detail.html'">
+                    <span class="mx-auto">直接入力</span>
+                    <img src="../images/chevron-right.svg">
+                </button>
+                <hr>
+
+                <div class="mb-4 text-center">
+                    <label class="form-label">品番</label>
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                </div>
+
+                <div class="mb-3 text-center">
+                    <label class="form-label text-decoration-underline">ブランド選択</label>
+                    <div class="d-inline-block position-relative mb-2">
+                        <div class="form-control rounded-0 f2f2-bg tooltip-input" onmouseover="showTooltip(this)"
+                            onmouseout="hideTooltip(this)">
+                            ヨネックス
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-center">
+                    <label class="form-label text-decoration-underline">カテゴリ選択</label>
+                    <div class="d-inline-block position-relative mb-2">
+                        <div class="form-control rounded-0 f2f2-bg tooltip-input" onmouseover="showTooltip(this)"
+                            onmouseout="hideTooltip(this)">
+                            アクセサリ、シューズ
+                        </div>
+                    </div>
+                </div>
+
+
+                <button class="btn btn-primary mb-4 d-flex justify-content-between align-items-center rounded-0">
+                    <span class="mx-auto">検索</span>
+                    <img src="../images/chevron-right.svg">
+                </button>
+                <hr>
+            </div>
+
+            <label class="form-label mt-2">一括注文</label>
+            <button class="btn btn-primary mb-2 d-flex justify-content-between align-items-center rounded-0">
+                <span class="mx-auto">CSV選択</span>
+                <img src="../images/chevron-right.svg">
+            </button>
+
+            <label class="form-label text-decoration-underline mb-5">一括注文とは？</label>
+
+            <nav class="nav flex-column nav-list">
+                <a class="nav-link text-white position-relative" href="./home.html">
+                    <img src="../images/house-door-fill.svg" class="me-3"> ホーム
+                </a>
+                <a class="nav-link text-white position-relative" href="./order_history.html">
+                    <img src="../images/file-earmark-text-fill.svg" class="me-3">注文履歴</a>
+                <a class="nav-link text-white position-relative" href="./setting.html">
+                    <img src="../images/gear_fill_menu.svg" class="me-3">設定</a>
+                <a class="nav-link text-white position-relative nav-link-after" href="#">
+                    <img src="../images/box-arrow-left.svg" class="me-2">ログアウト</a>
+            </nav>
+        </aside>
+
+        <main class="flex-grow-1">
+            <div class="order-detail">
+                <div class="container-fluid">
+                    <div class="width-order-detail">
+                        <button onclick="addRows()"
+                            class="btn btn-primary mb-2 d-flex justify-content-between align-items-center rounded-0 btn-bg">
+                            <span class="mx-auto">明細追加</span>
+                            <img src="../images/plus.svg" />
+                        </button>
+
+                        <table class="custom-table table-bordered">
+                            <thead class="text-center table-dark order-thead">
+                                <tr>
+                                    <th rowspan="2" class="width-151">品番</th>
+                                    <th colspan="4" class="width-812">商品名</th>
+                                    <th class="width-120">注文数</th>
+                                    <th class="width-150">単価</th>
+                                    <th class="width-150">金額</th>
+                                    <th class="width-82"></th>
+                                </tr>
+                                <tr>
+                                    <th class="width-297">ブランド</th>
+                                    <th class="width-240">カラー</th>
+                                    <th class="width-200">サイズ</th>
+                                    <th class="width-7">在庫数</th>
+                                    <th colspan="4" class="width-502">摘要</th>
+                                </tr>
+                            </thead>
+                        </table>
+
+                        <table id="productTable" class="table-bordered product-container mt-4 ">
+                            <tbody class="tbody-b-c">
+                                <!-- Rows will be added here -->
+                            </tbody>
+                        </table>
+
+                        <div class="total mt-3">
+                            <label class="text-primary mx-4">注文金額合計</label>
+                            <div class="form-control rounded-0 me-4" id="total-amount">
+                                 0
+                            </div>
+                        </div>
+
+                        <div class="container-main-content">
+                            <div class="main-content-left">
+                                <label for="order-note">注文備考欄</label>
+                                <textarea id="order-note" rows="5" cols="50" class="text-area order-note"></textarea>
+                            </div>
+
+                            <div class="main-content-right">
+                                <div class="main-content-sub-left">
+                                    <label for="shipping-default">配送先</label>
+                                    <select name="shipping_default" id="shipping-default">
+                                        <option value="option1">スポーツハウス アローザ 1</option>
+                                        <option value="option2">スポーツハウス アローザ 2</option>
+                                        <option value="option3">スポーツハウス アローザ 3</option>
+                                        <option value="option4">スポーツハウス アローザ 4</option>
+                                    </select>
+
+                                </div>
+                                <div class="main-content-sub-right">
+                                    <!-- Postal Code -->
+                                    <div class="align-items-center mt-3 gap-1 d-flex">
+                                        <label for="zip1">郵便番号</label>
+                                        <div id="zip1" class="zip1"></div>
+                                        <span>-</span>
+                                        <div id="zip2" class="zip2"></div>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="address-container">
+                                        <div class="address-row">
+                                            <label for="address1" class="label-text">住所</label>
+                                            <div id="address1" class="address1 tooltip-input"
+                                                onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"></div>
+                                        </div>
+                                        <div class="address-row">
+                                            <label for="address2" class="label-text"></label>
+                                            <div id="address2" class="address2 tooltip-input"
+                                                onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Phone Number -->
+                                    <div class="d-flex align-items-center gap-1">
+                                        <label for="Tel1">電話番号</label>
+                                        <div class="phone-number-container">
+                                            <div id="Tel1" class="tel-input"></div>
+                                            <span>-</span>
+                                            <div id="Tel2" class="tel-input"></div>
+                                            <span>-</span>
+                                            <div id="Tel3" class="tel-input"></div>
+                                        </div>
+                                    </div>
+                                    <p>※情報に誤りがある場合はお手数ですがテニックまでご連絡ください。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="btn-center">
+                            <button
+                                class="btn btn-primary d-flex justify-content-between align-items-center rounded-0 mt-4"
+                                id="goToOrderConfirm">
+                                <span class="mx-auto">注文確認</span>
+                                <img src="../images/chevron-right.svg">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        </main>
+    </div>
+    <!-- product modal -->
+    <div id="overlay" class="overlay"></div>
+    <div id="productModal" class="modal">
+        <button type="button" class="btn-close position-absolute closebtn-for-popup" id="closeBtn"></button>
+        <div class="model-header">
+            <label id="productId"></label>
+            <p>注文する商品名を選択してください。</p>
+        </div>
+        <table class="product-table table-bordered">
+            <thead class="text-center table-dark product-thead">
+                <tr>
+                    <th class="th-b-c">ブランド</th>
+                    <th class="width-783">商品名</th>
+                </tr>
+            </thead>
+            <tbody id="productList"></tbody>
+        </table>
+
+        <div class="center-container">
+            <button type="button" class="btn btn-primary text-white rounded-0" id="closeModalBtn">
+                閉じる
+            </button>
+        </div>
+
+    </div>
+    <!-- delete modal -->
+    <div id="deleteOverlay"></div>
+    <div id="deleteModal">
+        <div class="modal-body justify-content-center">この行を削除してもよろしいですか?</div>
+        <div class="modal-footer d-flex d-flex-row justify-content-between mt-4">           
+            <button class="btn btn-danger d-flex align-items-center justify-content-center"
+                id="confirmDelete">はい</button>
+            <button class="btn btn-secondary d-flex align-items-center justify-content-center"
+                id="closeDeleteModal">いいえ</button>
+        </div>
+    </div>
+
+    <!-- product not found modal -->
+    <div class="not-found-overlay" id="notFoundOverlay"></div>
+    <div class="not-found-modal" id="notFoundModal">
+        <h6>商品IDが見つかりません！</h6>
+        <button type="button" class="del-btn mt-4" id="closeNotFoundModal">閉じる</button>
+    </div>
+
+    <!-- Overlay for max row modal -->
+    <div id="limitOverlay"></div>
+
+    <!-- Max Row Limit Modal -->
+    <div id="limitModal" class="not-found-modal">
+    <div class="modal-body justify-content-center">これ以上追加できません。</div>
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-danger d-flex align-items-center justify-content-center rounded-0" id="closeLimitModal">OK</button>
+    </div>
+</div>
+    <script>
+        let productRowsData = [];
+        let productData = [
+    {
+        product_id: "10601j",
+        product_name: "ランニングシューズ（10601j）",
+        brand_name: "ランニングマスター",
+        reserved_amount: 17,
+        arrival_date: "2023-12-20",
+        variants: [
+            { color: "グレー", size: "M", price: "3,500,900", instock: 11, admin_no: "10601j1" },
+            { color: "グレー", size: "L", price: "2,100", instock: 12, admin_no: "10601j2" },
+            { color: "グレー", size: "XL", price: "2,300", instock: 2, admin_no: "10601j3" },
+            { color: "ブラック", size: "M", price: "1,900", instock: 32, admin_no: "10601j4" },
+            { color: "ブラック", size: "L", price: "2,200", instock: 15, admin_no: "10601j5" },
+            { color: "ブラック", size: "XL", price: "2,400", instock: 16, admin_no: "10601j6" }
+        ]
+    },
+    {
+        product_id: "10601",
+        product_name: "スポーツパンツ/ジュニア（1060)",
+        brand_name: "スポーツウェア",
+        reserved_amount: 7,
+        arrival_date: "2023-12-15",
+        variants: [
+            { color: "ホワイト", size: "J120", price: "5,900", instock: 6, admin_no: "106011" },
+            { color: "ホワイト", size: "J130", price: "6,300", instock: 4, admin_no: "106012" },
+            { color: "ホワイト", size: "J140", price: "6,600", instock: 3, admin_no: "106013" },
+            { color: "レッド", size: "J120", price: "6,000", instock: 7, admin_no: "106014" },
+            { color: "レッド", size: "J130", price: "6,400", instock: 2, admin_no: "106015" },
+            { color: "レッド", size: "J140", price: "6,700", instock: 3, admin_no: "106016" }
+        ]
+    },
+    {
+        product_id: "10601",
+        product_name: "スポーツパンツ/ジュニア（10601）",
+        brand_name: "セントクリストファー",
+        reserved_amount: 9,
+        arrival_date: "2023-12-18",
+        variants: [
+            { color: "イエロー", size: "J120", price: "5,900", instock: 4, admin_no: "1060111" },
+            { color: "イエロー", size: "J130", price: "6,300", instock: 5, admin_no: "1060112" },
+            { color: "イエロー", size: "J140", price: "6,600", instock: 6, admin_no: "1060113" },
+            { color: "ブラック", size: "J120", price: "5,900", instock: 4, admin_no: "1060114" },
+            { color: "ブラック", size: "J130", price: "6,300", instock: 5, admin_no: "1060115" },
+            { color: "ブラック", size: "J140", price: "6,600", instock: 6, admin_no: "1060116" }
+        ]
+    },
+    {
+        product_id: "10602j",
+        product_name: "スポーツパンツ/ジュニア（106014）",
+        brand_name: "スポーツウェア",
+        reserved_amount: 4,
+        arrival_date: "2023-12-15",
+        variants: [
+            { color: "イエロー", size: "L", price: "8,800", instock: 11, admin_no: "10602j1" }
+        ]
+    },
+    {
+        product_id: "10603j",
+        product_name: "スポー",
+        brand_name: "",
+        reserved_amount: 0,
+        arrival_date: null,
+        variants: []
+    }
+];
+        /**
+        * Displays a tooltip with the text content of an element.
+        * The tooltip appears if the text overflows the element.
+        * 
+        * @param {HTMLElement} element - The element that triggers the tooltip.
+        */
+        function showTooltip(element) {
+            let tooltip = document.querySelector('.tooltip-box');
+            // If tooltip does not exist, create a new one
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.classList.add('tooltip-box');
+                document.body.appendChild(tooltip);
+            }
+            // Set the tooltip text
+            tooltip.textContent = element.textContent.trim();
+
+            // Check if text is overflowing before displaying the tooltip
+            if (element.scrollWidth - element.clientWidth > 0) {
+                const rect = element.getBoundingClientRect();
+                tooltip.style.display = 'block';
+                tooltip.style.top = `${rect.top + window.scrollY + element.offsetHeight + 15}px`;
+                tooltip.style.left = `${rect.left + window.scrollX}px`;
+
+                let tooltipRect = tooltip.getBoundingClientRect();
+                const windowWidth = window.innerWidth;
+
+                if (tooltipRect.right > windowWidth) {
+                    let currentLeft = parseInt(tooltip.style.left) || 0;
+                    let newLeft = currentLeft - (tooltipRect.right - windowWidth) - 50;
+                    tooltip.style.left = `${newLeft}px`;
+                    tooltipRect = tooltip.getBoundingClientRect();
+                    let arrowLeft = rect.left - tooltipRect.left + element.offsetWidth / 4 - 15;
+                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+                } else {
+                    let arrowLeft = element.offsetWidth / 4 - 15;
+                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+                }
+            } else {
+                tooltip.style.display = 'none';
+            }
+        }
+
+        // Hides the tooltip when the mouse leaves the element.
+        function hideTooltip() {
+            const tooltip = document.querySelector('.tooltip-box');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+        // Calculates and updates the total amount by summing all prices in elements with class "total-price"
+        function updateTotalAmount() {
+            let totalAmount = 0;
+
+            $(".total-price").each(function () {
+               // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+                let priceText = $(this).text().replace(/\u00A5/, "").replace(/,/g, "");
+                let price = parseFloat(priceText) || 0;
+                totalAmount += price;
+            });
+
+            $("#total-amount").html(`&#165;${totalAmount.toLocaleString()}`);
+        }
+        //this is latest scopte 
+        function updateTotalPrice(inputElement) {
+            let row = $(inputElement).closest("tr");
+            let quantity = parseInt($(inputElement).val(), 10) || 0;
+            // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+            let priceText = row.find(".product-price").text().replace(/\u00A5/, "").replace(/,/g, "");
+            let price = parseFloat(priceText) || 0;
+
+            let totalPrice = quantity * price;
+            row.find(".total-price").html(`&#165;${totalPrice.toLocaleString()}`);            
+            // Use admin_no instead of product_id
+            let adminNo = row.find(".admin-no-input").val();
+            let rowData = productRowsData.find(p => p.admin_no === adminNo);
+            if (rowData) {
+                rowData.totalPrice = totalPrice;
+            }
+        }
+
+        $(document).ready(function () {
+            //Combine Jquery function into one
+            $('#goToOrderConfirm').click(function () {
+                goOrderConfirm();
+            });
+            /**
+            * Event listener for clicking the edit button.
+            * Enables editing of product-related fields by showing input elements and removing readonly text.
+            */
+            $(document).on("click", ".edit-button-show", function () {
+                let row = $(this).closest("tr");
+                let firstRow = row.prev();
+                firstRow.find(".product-id-input").show().siblings(".readonly-text").remove();
+                row.find(".product-color-container").removeClass("td-bag").find(".product-color").show().siblings(".readonly-text").remove();
+                row.find(".product-size-container").removeClass("td-bag").find(".product-size").show().siblings(".readonly-text").remove();
+                firstRow.find(".order-instock").show().siblings(".readonly-text").remove();
+                row.find(".order-remark-container").removeClass("td-bag").find(".order-remark").show().siblings(".text-left").remove();
+                row.find(".select-no-one").removeClass("td-bag readonly-text text-center");
+
+                $(this).removeClass("edit-button-show").addClass("edit-button-hide");
+            });            
+
+            /**
+             * Event listener for when the product color is changed in the dropdown.
+             * Updates the local storage with the selected color.
+             */
+            $(document).on("change", ".product-color", function () {
+                let row = $(this).closest("tr");
+                let adminNo = row.prev().find(".admin-no-input").val();
+                let color = $(this).val();
+
+                let rowData = productRowsData.find(p => p.admin_no === adminNo);
+                if (rowData) {
+                    rowData.color = color;
+                }
+            });
+
+            /**
+             * Event listener for when the product size is changed in the dropdown.
+             * Updates the local storage with the selected size.
+             */
+            $(document).on("change", ".product-size", function () {
+                let row = $(this).closest("tr");
+                let adminNo = row.prev().find(".admin-no-input").val();
+                let size = $(this).val();
+                let rowData = productRowsData.find(p => p.admin_no === adminNo);
+                if (rowData) {
+                    rowData.size = size;
+                }
+            });
+
+            /**
+             * Event listener for updating the in-stock quantity field.
+             * Saves the updated quantity in local storage.
+             */
+            $(document).on("input", ".order-instock", function () {
+                let row = $(this).closest("tr");
+                let adminNo = row.find(".admin-no-input").val();
+                let order_instock = $(this).val();
+
+                let rowData = productRowsData.find(p => p.admin_no === adminNo);
+                if (rowData) {
+                    rowData.order_instock = order_instock;
+                    if ((rowData.order_remark || rowData.order_instock) && !rowData.addRowsCalled) {
+                        if (!hasBlankRow()) {
+                            addRows();
+                            rowData.addRowsCalled = true;
+                        }
+                    }
+
+                    // update total price
+                    // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+                    let priceText = row.find(".product-price").text().replace(/\u00A5/, "").replace(/,/g, "");
+                    let price = parseFloat(priceText) || 0;
+                    let quantity = parseInt(order_instock, 10) || 0;
+                    let totalPrice = quantity * price;
+                    row.find(".total-price").html(`&#165;${totalPrice.toLocaleString()}`);  
+                    rowData.totalPrice = totalPrice;
+                }
+                updateTotalAmount();
+            });
+
+            /**
+             * Event listener for updating the order remark field.
+             * Saves the updated remark in local storage.
+             */
+            $(document).on("input", ".order-remark", function () {
+                let row = $(this).closest("tr");
+                let adminNo = row.prev().find(".admin-no-input").val();
+                let order_remark = $(this).val();
+                let rowData = productRowsData.find(p => p.admin_no === adminNo);
+                if (rowData) {
+                    rowData.order_remark = order_remark;
+                    if ((rowData.order_remark || rowData.order_instock) && !rowData.addRowsCalled) {
+                        if (!hasBlankRow()) {
+                            addRows();
+                            rowData.addRowsCalled = true;
+                        }
+                    }
+                }
+            });
+            // Only add row if there's no blank row
+            function hasBlankRow() {
+                let blankRowFound = false;
+                $("#productTable tbody tr").each(function (index, tr) {
+                    if (index % 3 === 0) { // Check only the first row of each logical set
+                        let inputVal = $(tr).find(".product-id-input").val();
+                        if (!inputVal) {
+                            blankRowFound = true;
+                            return false; // Break loop
+                        }
+                    }
+                });
+                return blankRowFound;
+            }
+            let currentPage = window.location.pathname.split("/").pop();
+            $(".nav-list .nav-link").removeClass("active-nav");
+            $('.nav-list .nav-link[href="./' + currentPage + '"]').addClass("active-nav");
+
+            let notFoundRowIndex = null;
+            // Handles product ID input, searches for matching products, and displays modals based on the result.
+            $(document).on("keydown", ".product-id-input", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+
+                    let productId = $(this).val().trim();
+                    let row = $(this).closest("tr");
+                    let rowIndex = row.data("row-index");
+
+                    let matchingProducts = productData.filter(p => p.product_id === productId);
+
+                    if (matchingProducts.length === 0) {
+                        notFoundRowIndex = rowIndex;
+                        $('#notFoundModal, #notFoundOverlay').show();
+                    } else if (matchingProducts.length === 1) {
+                        populateProductRow($(this), matchingProducts[0]);
+                    } else {
+                        showProductSelectionModal(matchingProducts, $(this));
+                    }
+                }
+            });
+            // Closes the "Not Found" modal and resets the related row data when closed.
+            $('#closeNotFoundModal, #notFoundOverlay').click(function () {
+                $("#notFoundModal").hide();
+                $("#notFoundOverlay").hide();
+                if (notFoundRowIndex !== null) {
+                    let rows = $("#productTable tbody").find(`tr[data-row-index="${notFoundRowIndex}"]`);
+                    let firstRow = rows;
+                    let secondRow = firstRow.next(); // Next sibling row
+                    firstRow.find(".product-id-input").val("");
+                    firstRow.find(".product-name").text("");
+                    firstRow.find(".total-price").text("");
+                    firstRow.find(".product-price").text("");
+                    firstRow.find(".order-instock").val("");
+                    firstRow.find(".order-instock").prop("disabled", true);
+                    firstRow.find(".admin-no-input").val("");
+                    secondRow.find(".stock-quantity").text("");
+                    secondRow.find(".brand-name").text("");
+                    secondRow.find(".order-remark").val("");
+                    secondRow.find(".product-color").val("");
+                    secondRow.find(".product-size").val("");
+                    secondRow.find(".select-no-one").text("");
+                    notFoundRowIndex = null;
+                }
+            });
+
+            /**
+                 * Displays a modal that allows users to select a product when multiple matches are found.
+                 * Populates the modal with a list of matching products and handles selection.
+                 *
+            */
+            function showProductSelectionModal(products, inputElement) {
+                let modal = $("#productModal");
+                let overlay = $("#overlay");
+                let productList = $("#productList");
+                productList.empty();
+                $(document).off("click", "#productList .productName");
+                if (products.length > 0) {
+                    $("#productId").html(`品番 「${products[0].product_id}」で複数の商品が見つかりました。`);
+                }
+                products.forEach((product, index) => {
+                    let row = $(`
+                <tr>
+                    <td class="width-180 tooltip-input" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">${product.brand_name}</td>
+                    <td class="product-td productName width-783 tooltip-input" data-index="${index}" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">${product.product_name}</td>
+                </tr>
+            `);
+                    productList.append(row);
+                });
+                modal.show();
+                overlay.show();
+
+                $(document).on("click", "#productList .productName", function () {
+                    let index = $(this).data("index");
+                    let selectedProduct = products[index];
+                    populateProductRow(inputElement, selectedProduct);
+                    closeModal();
+                    $(document).off("click", "#productList .productName");
+                });
+                $("#closeBtn").click(closeModal);
+                $("#closeModalBtn").click(closeModal);
+            }
+            // Closes the product modal and overlay.
+            function closeModal() {
+                $("#productModal").hide();
+                $("#overlay").hide();
+            }
+        });
+
+
+        /**
+         * Updates the total order amount by summing up all the total prices.
+         * Stores the updated amount in local storage.
+         */
+        function updateTotalAmount() {
+            let totalAmount = 0;
+            $(".total-price").each(function () {
+                // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+                let priceText = $(this).text().replace(/\u00A5/, "").replace(/,/g, "");
+                let price = parseFloat(priceText) || 0;
+                totalAmount += price;
+            });
+
+            $("#total-amount").html(`&#165;${totalAmount.toLocaleString()}`);            
+        }
+        /**
+         * Updates the total price for a product row based on the entered quantity.
+         * Retrieves product price, calculates total, and saves data in local storage.
+         */
+        function updateTotalPrice(inputElement) {
+            let row = $(inputElement).closest("tr");
+            let quantity = parseInt($(inputElement).val(), 10) || 0;
+            // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+            let priceText = row.find(".product-price").text().replace(/\u00A5/, "").replace(/,/g, "");
+            let price = parseFloat(priceText) || 0;
+
+            let totalPrice = quantity * price;
+            row.find(".total-price").html(`&#165;${totalPrice.toLocaleString()}`);  
+            let productId = row.find(".product-id-input").val();
+            let rowData = productRowsData.find(p => p.product_id === productId);
+            if (rowData) {
+                rowData.totalPrice = totalPrice;
+            }
+        }
+
+        /**
+         * Populates a product row with data such as product ID, name, brand, color, and size.
+         * Handles dynamic color and size selection, updates local storage, and sets event listeners.
+         */
+        let emptyRowsAdded = false;
+        function populateProductRow(inputElement, product, existingRowData = null) {
+            let firstRow = inputElement.closest("tr");
+            let secondRow = firstRow.next();
+
+            // Clear old data if no existing data
+            if (!existingRowData) {
+                firstRow.find(".order-instock").val("");
+                firstRow.find(".product-price").text("");
+                secondRow.find(".stock-quantity").text("");
+                firstRow.find(".total-price").text("");
+                secondRow.find(".order-remark").val("");
+            }
+
+            // Basic setup
+            let order_instock = existingRowData?.order_instock || "";
+            let order_remark = existingRowData?.order_remark || "";
+            firstRow.find(".order-instock").val(order_instock);
+            secondRow.find(".order-remark").val(order_remark);
+            firstRow.find(".product-id-input").val(product.product_id);
+            firstRow.find(".product-name").text(product.product_name);
+            secondRow.find(".brand-name").text(product.brand_name);
+
+            ensureBlankRow();
+
+            let deleteButton = firstRow.find(".delete-btn");
+            if (!product.product_name) deleteButton.hide();
+            else deleteButton.show();
+
+            let colorContainer = secondRow.find(".product-color-container");
+            let sizeContainer = secondRow.find(".product-size-container");
+            colorContainer.empty();
+            sizeContainer.empty();
+
+            let uniqueColors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
+            let uniqueSizes = [...new Set(product.variants.map(v => v.size).filter(Boolean))];
+
+            // === COLOR SETUP ===
+            if (uniqueColors.length === 0) {
+                colorContainer.html(`<span class="ps-2 select-no-one">&#8212;</span>`);
+                firstRow.find(".order-instock").prop('disabled', true);
+            } else if (uniqueColors.length === 1) {
+                let color = uniqueColors[0];
+                colorContainer.html(`<span class="ps-2 select-no-one tooltip-input" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">${color}</span>`);
+            } else {
+                let colorSelect = $('<select class="form-select form-select-sm product-color"></select>');
+                colorSelect.append('<option value=""> </option>');
+                uniqueColors.forEach(color => colorSelect.append(`<option value="${color}">${color}</option>`));
+                colorContainer.append(colorSelect);
+                if (existingRowData?.color) {
+                    colorSelect.val(existingRowData.color);
+                }
+            }
+
+            // === SIZE SETUP ===
+            if (uniqueSizes.length === 0) {
+                sizeContainer.html(`<span class="ps-2 select-no-one">&#8212;</span>`);
+                firstRow.find(".order-instock").prop('disabled', true);
+            } else if (uniqueSizes.length === 1) {
+                let size = uniqueSizes[0];
+                sizeContainer.html(`<span class="ps-2 select-no-one">${size}</span>`);
+            } else {
+                let sizeSelect = $('<select class="form-select form-select-sm product-size"></select>');
+                sizeSelect.append('<option value=""> </option>');
+                uniqueSizes.forEach(size => sizeSelect.append(`<option value="${size}">${size}</option>`));
+                sizeContainer.append(sizeSelect);
+                if (existingRowData?.size) {
+                    sizeSelect.val(existingRowData.size);
+                }
+            }
+
+            // If both color and size are single values, enable immediately
+            if (uniqueColors.length === 1 && uniqueSizes.length === 1) {
+                let color = uniqueColors[0];
+                let size = uniqueSizes[0];
+                firstRow.find(".order-instock").prop('disabled', false);
+                updateVariantDetails(firstRow, secondRow, product, color, size);
+                setAdminNo(firstRow, product, color, size);
+            }
+            // Handles variant selection, updates details if valid, or clears the row if the variant doesn't exist.
+            function handleVariantSelection() {
+                let selectedColor = colorContainer.find(".product-color").val() ||
+                    (uniqueColors.length === 1 ? uniqueColors[0] : "");
+                let selectedSize = sizeContainer.find(".product-size").val() ||
+                    (uniqueSizes.length === 1 ? uniqueSizes[0] : "");
+
+                if (selectedColor && selectedSize) {
+                    // Check if this variant exists
+                    let variantExists = product.variants.some(v =>
+                        v.color === selectedColor && v.size === selectedSize
+                    );
+
+                    if (variantExists) {
+                        updateVariantDetails(firstRow, secondRow, product, selectedColor, selectedSize);
+                        setAdminNo(firstRow, product, selectedColor, selectedSize);
+                        firstRow.find(".order-instock").prop('disabled', false);
+                        let quantity = parseInt(firstRow.find(".order-instock").val());
+                        if (quantity) {
+                            recalculateTotal(firstRow);
+                            updateTotalAmount();
+                        }
+                    } else {
+                        clearRow(firstRow, secondRow);
+                        firstRow.find(".order-instock").prop('disabled', true);
+                        // Optional: Show message that this combination doesn't exist
+                    }
+                } else {
+                    clearRow(firstRow, secondRow);
+                    firstRow.find(".order-instock").prop('disabled', true);
+                }
+            }
+
+            // === COLOR CHANGE ===
+            colorContainer.on("change", ".product-color", handleVariantSelection);
+
+            // === SIZE CHANGE ===
+            sizeContainer.on("change", ".product-size", handleVariantSelection);
+
+
+            // === EXISTING VARIANT SETUP (Color+Size) ===
+            if (existingRowData?.color && existingRowData?.size) {
+                updateVariantDetails(firstRow, secondRow, product, existingRowData.color, existingRowData.size);
+                setAdminNo(firstRow, product, existingRowData.color, existingRowData.size);
+                recalculateTotal(firstRow);
+                updateTotalAmount();
+            }
+
+            // === FINAL SAVE TO STORAGE ===
+            let variant = product.variants.find(v => v.color === existingRowData?.color && v.size === existingRowData?.size);
+            let adminNo = variant?.admin_no || "";
+            firstRow.find(".admin-no-input").val(adminNo);
+
+            let newRowData = {
+                product_id: product.product_id,
+                product_name: product.product_name,
+                brand_name: product.brand_name,
+                color: existingRowData?.color || "",
+                size: existingRowData?.size || "",
+                price: variant?.price || "0",
+                stock_quantity: variant?.instock || 0,
+                order_instock: order_instock,
+                order_remark: order_remark,
+                totalPrice: existingRowData?.totalPrice || 0,
+                admin_no: adminNo,
+            };
+            if (product.variants.length === 1) {
+                setAdminNo(firstRow, product, product.variants[0].color, product.variants[0].size);
+            } else if (product.variants.length === 0) {
+                setAdminNo(firstRow, product, "", "")
+            }
+            let dataExists = productRowsData.some(row =>
+            row.product_id === newRowData.product_id &&
+            row.color === newRowData.color &&
+            row.size === newRowData.size &&
+            row.admin_no === newRowData.admin_no);           
+            
+            if (dataExists) {
+            if (!emptyRowsAdded) {
+                addRows();
+                emptyRowsAdded = true;
+            }
+            }
+            updateTotalAmount();
+            checkAndDisplayEditButton(secondRow, newRowData);
+        }
+        // === HELPER FUNCTIONS ===
+        function clearRow(firstRow, secondRow) {
+            firstRow.find(".product-price").text("");
+            secondRow.find(".stock-quantity").text("");
+            firstRow.find(".total-price").text("");
+            firstRow.find(".order-instock").val("");
+            firstRow.find(".order-instock").prop('disabled', true);
+            firstRow.find(".admin-no-input").val("");
+        }
+        // Recalculates and updates the total price based on quantity and product price.
+        function recalculateTotal(firstRow) {
+            let quantity = parseInt(firstRow.find(".order-instock").val(), 10) || 0;
+            // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+            let priceText = firstRow.find(".product-price").text().replace(/\u00A5/, "").replace(/,/g, "");
+            let price = parseFloat(priceText) || 0;
+            let totalPrice = quantity * price;
+            firstRow.find(".total-price").html(`&#165;${totalPrice.toLocaleString()}`);
+        }
+        // Sets the AdminNO and row data for the product, including price, stock, and order details.
+        function setAdminNo(firstRow, product, color, size) {
+            let variant = product.variants.find(v => v.color === color && v.size === size);
+            let adminNo = variant?.admin_no || "";
+
+            firstRow.find(".admin-no-input").val(adminNo);
+
+            // Get other row-related data
+            let order_instock = firstRow.find(".order-instock").val();
+            let order_remark = firstRow.next().find(".order-remark").val();
+            // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+            let priceText = firstRow.find(".product-price").text().replace(/\u00A5/, "").replace(/,/g, "");
+            let price = parseFloat(priceText) || 0;
+            let totalPrice = (parseInt(order_instock) || 0) * price;
+
+
+            let rowData = {
+                product_id: product.product_id,
+                product_name: product.product_name,
+                brand_name: product.brand_name,
+                color: color,
+                size: size,
+                price: price,
+                stock_quantity: variant?.instock || 0,
+                order_instock: order_instock,
+                order_remark: order_remark,
+                totalPrice: totalPrice,
+                admin_no: adminNo
+            };
+
+            let existingIndex = productRowsData.findIndex(p => p.admin_no === adminNo);
+            if (existingIndex !== -1) {
+                productRowsData[existingIndex] = rowData;
+            } else {
+                productRowsData.push(rowData);
+            }
+        }
+        // Ensures a blank row is present by checking if there are enough rows and extracting necessary details.
+        function ensureBlankRow() {
+            setTimeout(() => {
+                let rows = document.querySelectorAll("#productTable tbody tr:not(.gap-row)");
+                if (rows.length < 2) {
+                    return; // Exit early if no rows are found
+                }
+
+                let lastRow = rows[rows.length - 2];
+                let detailRow = rows[rows.length - 1]
+                let productIdInput = lastRow.querySelector(".product-id-input");
+                let productName = lastRow.querySelector(".product-name");
+                let orderInstock = lastRow.querySelector(".order-instock");
+                let productColor = detailRow.querySelector(".product-color");
+                let productSize = detailRow.querySelector(".product-size");
+                let orderRemark = detailRow.querySelector(".order-remark");
+            }, 200)
+        }
+        window.ensureBlankRow = ensureBlankRow;
+       // Updates product variant details (price, stock quantity) based on selected color and size.
+        function updateVariantDetails(firstRow, secondRow, product, selectedColor, selectedSize) {
+            let selectedVariant = product.variants.find(v => v.color === selectedColor && v.size === selectedSize);
+            if (selectedVariant) {
+                firstRow.find(".product-price").html("&#165;" + selectedVariant.price);                
+                secondRow.find(".stock-quantity").text(selectedVariant.instock);
+                firstRow.find(".order-instock").attr("max", selectedVariant.instock);
+                firstRow.find(".order-instock").prop('disabled', false);
+            } else {
+                firstRow.find(".product-price").text("");
+                secondRow.find(".stock-quantity").text("");
+                firstRow.find(".order-instock").prop('disabled', true);
+            }
+        }
+       // Show the limit modal and overlay for row limit warning.
+        function showLimitModal() {
+            $('#limitOverlay').show();
+            $('#limitModal').show();
+        }
+        // hide the limit modal and overlay for row limit warning.
+        function hideLimitModal() {
+            $('#limitOverlay').hide();
+            $('#limitModal').hide();
+        }
+
+        $('#closeLimitModal').on('click', hideLimitModal);
+
+       // Adds rows to the table
+        function addRows(isBlankRow = true) { 
+            // Adds rows to the table, but limits to a maximum of 30 rows.
+            const maxRows = 30;
+            const currentLogicalRows = $('#productTable tbody tr').length / 3;
+
+            if (currentLogicalRows >= maxRows) {
+                showLimitModal();
+                return;
+            }
+            let tableBody = document.querySelector("#productTable tbody");
+            let rowIndex = tableBody.querySelectorAll("tr").length / 3;
+            // First row (product details)
+            let firstRow = document.createElement("tr");
+            firstRow.setAttribute('data-row-index', rowIndex);
+            firstRow.innerHTML = `
+            <td class="width-151">
+               <input type="text" class="form-control input-151 product-id-input input-h-b" oninput="validateInput(this)" maxlength="32" 
+                onblur="setTimeout(() => ensureBlankRow(), 300);" />
+                <input type="hidden" class="admin-no-input" value="" />
+             </td>                
+            <td colspan="4" class="width-812 td-bag product-name tooltip-input" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"></td>
+            <td class="width-120"> <input type="text" class="form-control input-120 order-instock text-end input-h-b" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);" disabled/></td>
+            <td class="width-150 td-bag product-price text-end text-nowrap"></td>
+            <td class="width-150 td-bag total-price text-end text-nowrap"></td>
+                <td class="width-82 td-bag text-center">
+            <span class="delete-btn" 
+                    style="display: ${isBlankRow ? 'none' : 'inline'};" 
+                    onclick="openDeleteModal(this)">削除</span>
+            </td>`;
+
+            let secondRow = document.createElement("tr");
+            secondRow.innerHTML = `
+            <td class="width-151 text-center td-bag"><button type="button" class="btn btn-primary text-white edit-button-hide rounded-0">編集</button></td>
+                <td class="width-297 td-bag tooltip-input brand-name" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"><span></td>
+                <td class="width-240 product-color-container">
+                    <select class="form-select form-select-sm product-color">                                           
+                    </select>
+                </td>
+                <td class="width-200 product-size-container">
+                    <select class="form-select form-select-sm product-size">                                          
+                    </select>
+                </td>
+                <td class="width-7 td-bag stock-quantity text-end"></td>
+                <td colspan="4" class="width-502 tooltip-input order-remark-container" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"><input type="text" class="form-control input-500 input-h-b order-remark" /></td>`;
+
+            // Add a gap row (empty row with height, no border)
+            let gapRow = document.createElement("tr");
+            gapRow.classList.add("gap-row");
+            gapRow.innerHTML = `<td colspan="8"></td>`;  // No content, just gap
+
+            tableBody.appendChild(firstRow);
+            tableBody.appendChild(secondRow);
+            tableBody.appendChild(gapRow);
+        }
+        // Clears the table and populates it with rows based on productRowsData, adding new rows if necessary.
+        function displayRows() {
+            let tableBody = document.querySelector("#productTable tbody");
+            tableBody.innerHTML = "";
+            if (!productRowsData || productRowsData.length === 0) {
+                addRows();
+                return;
+            }
+            productRowsData.forEach((data, index) => {
+                addRows();
+                let productInput = document.querySelectorAll(".product-id-input")[index];
+                if (productInput) {
+                    let matchingProduct = productData.find(p => p.product_id === data.product_id && p.brand_name === data.brand_name);
+                    if (matchingProduct) {
+                        populateProductRow($(productInput), matchingProduct, data);
+                    }
+                }
+            });
+        }
+        /**
+         * Checks if all required fields in a row are filled and updates the UI accordingly.
+         * If all fields are filled, it hides input fields and displays the values as read-only text.
+         * Also shows the edit button when data is complete.
+         */
+
+        function checkAndDisplayEditButton(row, rowData) {
+            let editButton = row.find(".edit-button-hide");
+            let firstRow = row.prev();
+
+            // Generate a unique key using product_id, color, and size (or other relevant fields)
+            let uniqueKey = `${rowData.product_id}_${rowData.color}_${rowData.size}`;
+
+            // Retrieve the saved data from localStorage
+            let savedData = localStorage.getItem("productRowsData");
+            let productRowsData = savedData ? JSON.parse(savedData) : [];
+
+            // Check if the unique key exists in localStorage
+            let productExistsInLocalStorage = productRowsData.some(data => {
+                return `${data.product_id}_${data.color}_${data.size}` === uniqueKey;
+            });
+
+            // Only show the edit button if the product data exists in localStorage
+            if (productExistsInLocalStorage) {
+                let selectedColor = row.find(".product-color").val();
+                let selectedSize = row.find(".product-size").val();
+
+                firstRow.find(".product-id-input").hide().after(`<span class="readonly-text td-bag text-start">${rowData.product_id}</span>`);
+                row.find(".product-color-container").addClass("td-bag").find(".product-color").hide().after(`<span class="readonly-text text-left tooltip-input pt-1 pb-1" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">${rowData.color}</span>`);
+                row.find(".product-size-container").addClass("td-bag").find(".product-size").hide().after(`<span class="readonly-text text-left tooltip-input pt-1 pb-1" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">${rowData.size}</span>`);
+                firstRow.find(".order-instock").hide().after(`<span class="readonly-text td-bag text-end">${rowData.order_instock || "0"}</span>`);
+                row.find(".order-remark-container").addClass("td-bag").find(".order-remark").hide().after(`<span class="text-left">${rowData.order_remark}</span>`);
+                row.find(".select-no-one").addClass("td-bag readonly-text text-left");
+
+                editButton.removeClass("edit-button-hide").addClass("edit-button-show");
+                row.data("selectedColor", selectedColor);
+                row.data("selectedSize", selectedSize);
+            } else {
+                firstRow.find(".product-id-input").show().siblings(".readonly-text").remove();
+                row.find(".product-color-container").removeClass("td-bag").find(".product-color").show().siblings(".readonly-text").remove();
+                row.find(".product-size-container").removeClass("td-bag").find(".product-size").show().siblings(".readonly-text").remove();
+                firstRow.find(".order-instock").show().siblings(".readonly-text").remove();
+                row.find(".order-remark-container").removeClass("td-bag").find(".order-remark").show().siblings(".text-left").remove();
+                row.find(".select-no-one").removeClass("td-bag readonly-text text-left");
+
+                editButton.removeClass("edit-button-show").addClass("edit-button-hide");
+
+                let savedColor = row.data("selectedColor");
+                let savedSize = row.data("selectedSize");
+
+                if (savedColor) {
+                    row.find(".product-color").val(savedColor);
+                }
+                if (savedSize) {
+                    row.find(".product-size").val(savedSize);
+                }
+            }
+        }
+        /**
+         * Opens the delete confirmation modal and sets the target row for deletion.
+         */
+        let targetRow;
+        function openDeleteModal(element) {
+            targetRow = element;
+            $('#deleteModal, #deleteOverlay').show();
+        }
+        /**
+         * Deletes the selected row and updates the local storage and total amount.
+         * Also removes related rows (e.g., detail rows and gap rows).
+         */
+        $('#confirmDelete').click(function () {
+            if (targetRow) {
+                let rowToDelete = targetRow.parentElement.parentElement;
+                let nextRow = rowToDelete.nextElementSibling;
+                let gapRow = nextRow ? nextRow.nextElementSibling : null;
+
+                let adminNo = rowToDelete.querySelector(".admin-no-input").value;
+                productRowsData = productRowsData.filter(p => p.admin_no !== adminNo);
+                rowToDelete.remove();
+                if (nextRow) nextRow.remove();
+                if (gapRow) gapRow.remove();
+                updateTotalAmount();
+
+                targetRow = null;
+            }
+            closeDeleteModal();
+        });
+
+        /**
+         * Closes the delete confirmation modal.
+         */
+        $('#closeDeleteModal, #deleteOverlay').click(function () {
+            closeDeleteModal();
+        });
+
+        // Closes the delete modal and resets the target row.
+        function closeDeleteModal() {
+            $('#deleteModal, #deleteOverlay').hide();
+            targetRow = null;
+        }
+        /**
+         * Validates user input to allow only alphanumeric characters.
+         */
+        function validateInput(input) {
+            input.value = input.value.replace(/[^A-Za-z0-9]/g, '');
+        }
+        /**
+         * Updates fields when the shipping default selection changes.
+         */
+        $('#shipping-default').on('change', function () {
+            const selectedOption = $(this).val();
+            updateFields(selectedOption);
+        });
+
+        const defaultOption = $('#shipping-default').val();
+        updateFields(defaultOption);
+        // Function to update user fields based on selected option
+        function updateFields(option) {
+            const data = {
+                option1: {
+                    zip1: '566',
+                    zip2: '000000',
+                    tel1: '06',
+                    tel2: '6666',
+                    tel3: '6666',
+                    address1: '東京都新宿区',
+                    address2: 'スポーツハウス アローザ 1',
+                },
+                option2: {
+                    zip1: '567',
+                    zip2: '111111',
+                    tel1: '03',
+                    tel2: '7777',
+                    tel3: '7777',
+                    address1: '東京都新宿区',
+                    address2: 'スポーツハウス アローザ 2',
+                },
+                option3: {
+                    zip1: '568',
+                    zip2: '222222',
+                    tel1: '04',
+                    tel2: '8888',
+                    tel3: '8888',
+                    address1: '横浜市中区',
+                    address2: 'スポーツハウス アローザ 3',
+                },
+                option4: {
+                    zip1: '569',
+                    zip2: '333333',
+                    tel1: '05',
+                    tel2: '9999',
+                    tel3: '9999',
+                    address1: '大阪市北区',
+                    address2: 'スポーツハウス アローザ 4',
+                }
+            };
+
+            const userData = data[option];
+
+            $('#zip1').text(userData.zip1);
+            $('#zip2').text(userData.zip2);
+            $('#Tel1').text(userData.tel1);
+            $('#Tel2').text(userData.tel2);
+            $('#Tel3').text(userData.tel3);
+            $('#address1').text(userData.address1);
+            $('#address2').text(userData.address2);
+
+            // Store selected user data globally
+            window.selectedUserData = userData;
+            window.selectedUserData.option = option;
+        }
+        // Update the order note when mouseout event occurs
+        let orderNote = "";
+        $(document).on("mouseout", ".order-note", function () {
+            let order_note = $(this).val();
+            orderNote = order_note;
+        });
+
+        // Prepare order data for confirmation
+        let orderData = [];
+        function goOrderConfirm() {
+            $("#productTable tbody tr:not(.gap-row)").each(function (i) {
+                if (i % 2 !== 0) return; // Skip odd rows, handle only pairs
+
+                let $first = $(this);
+                let $second = $(this).next(); // Get the next row (details)
+                if ($second.length === 0) return; // Skip if second row doesn't exist
+
+                // Helper function to get value or text content
+                let get = (el, selector) => el.find(selector).val()?.trim() || el.find(selector).text()?.trim() || "";
+
+                let product_id = get($first, ".product-id-input");
+                let product_name = get($first, ".product-name");
+                if (!product_id && !product_name) return; // Skip if no product info
+
+                let admin_no = get($first, ".admin-no-input");
+                let order_instock = get($first, ".order-instock");
+                let priceText = get($first, ".product-price").replace(/[^\d.-]/g, "");
+                let price = parseFloat(priceText) || 0;
+                let totalPrice = (parseInt(order_instock) || 0) * price;
+
+                // Prepare rowData object
+                let rowData = {
+                    product_id,
+                    product_name,
+                    brand_name: get($second, ".brand-name"),
+                    color: get($second, ".product-color") || get($second, ".product-color-container span"),
+                    size: get($second, ".product-size") || get($second, ".product-size-container span"),
+                    order_instock: order_instock,
+                    price: price.toLocaleString(),
+                    totalPrice: totalPrice.toLocaleString(),
+                    stock_quantity: parseInt(get($second, ".stock-quantity") || "0"),
+                    order_remark: get($second, ".order-remark"),
+                    admin_no
+                };
+
+                // Check if admin_no exists in orderData to update or push new
+                let existingIndex = orderData.findIndex(item => item.admin_no === admin_no);
+                if (existingIndex !== -1) {
+                    // Update the existing entry
+                    orderData[existingIndex] = rowData;
+                } else {
+                    // Push new entry
+                    orderData.push(rowData);
+                }
+            });
+            if (orderData.length > 0) {
+                const encodedData = encodeURIComponent(JSON.stringify(orderData));
+                const encodedOrderNote = encodeURIComponent($('#order-note').val());
+                const encodedUserData = encodeURIComponent(JSON.stringify(window.selectedUserData));
+                const url = `./order_confirm.html?productData=${encodedData}&orderNote=${encodedOrderNote}&userData=${encodedUserData}`;
+                location.href = url;
+            }
+        }
+        // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+        const isDataFromURL = window.location.search.includes('productData');
+        const localDataExists = localStorage.getItem('productRowsData') !== null;
+        if (isDataFromURL && localDataExists) {
+            // Load URL data first
+            const encodedData = getQueryParam('productData');
+            const encodedOrderNote = getQueryParam('orderNote');
+            const encodedUserData = getQueryParam('userData');
+
+            if (encodedData) {
+                productRowsData = JSON.parse(decodeURIComponent(encodedData));
+                displayRows(); // Display rows based on URL data
+            }
+
+            if (encodedOrderNote) {
+                orderNote = decodeURIComponent(encodedOrderNote);
+                $('#order-note').val(orderNote); // Set the order note in the input field
+            }
+
+            if (encodedUserData) {
+                const decodedUserData = decodeURIComponent(encodedUserData);
+                userData = JSON.parse(decodedUserData);
+                $('#shipping-default').val(userData.option);
+                $('#zip1').text(userData.zip1);
+                $('#zip2').text(userData.zip2);
+                $('#Tel1').text(userData.tel1);
+                $('#Tel2').text(userData.tel2);
+                $('#Tel3').text(userData.tel3);
+                $('#address1').text(userData.address1);
+                $('#address2').text(userData.address2);
+                window.selectedUserData = userData;
+            }
+
+        } else if (isDataFromURL) {
+            // Only URL data
+            const encodedData = getQueryParam('productData');
+            const encodedOrderNote = getQueryParam('orderNote');
+            const encodedUserData = getQueryParam('userData');
+
+            if (encodedData) {
+                productRowsData = JSON.parse(decodeURIComponent(encodedData));
+                displayRows(); // Display rows based on URL data
+            }
+
+            if (encodedOrderNote) {
+                orderNote = decodeURIComponent(encodedOrderNote);
+                $('#order-note').val(orderNote); // Set the order note in the input field
+            }
+
+            if (encodedUserData) {
+                const decodedUserData = decodeURIComponent(encodedUserData);
+                userData = JSON.parse(decodedUserData);
+                $('#shipping-default').val(userData.option);
+                $('#zip1').text(userData.zip1);
+                $('#zip2').text(userData.zip2);
+                $('#Tel1').text(userData.tel1);
+                $('#Tel2').text(userData.tel2);
+                $('#Tel3').text(userData.tel3);
+                $('#address1').text(userData.address1);
+                $('#address2').text(userData.address2);
+                window.selectedUserData = userData;
+            }
+
+        } else if (localDataExists) {
+            // Only localStorage data
+            let savedData = localStorage.getItem("productRowsData");
+            productRowsData = JSON.parse(savedData);
+            displayRows();
+
+            let getOrderNote = localStorage.getItem("orderNote");
+            if (getOrderNote) {
+                $('#order-note').val(getOrderNote);
+            }
+
+            const savedUserData = localStorage.getItem("userData");
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                $('#shipping-default').val(userData.option);
+                $('#zip1').text(userData.zip1);
+                $('#zip2').text(userData.zip2);
+                $('#Tel1').text(userData.tel1);
+                $('#Tel2').text(userData.tel2);
+                $('#Tel3').text(userData.tel3);
+                $('#address1').text(userData.address1);
+                $('#address2').text(userData.address2);
+                window.selectedUserData = userData;
+            }
+        } else {
+            // Initialize with default data
+            addRows();
+        }
+
+        // Function to merge data based on `admin_no`, ensuring no duplicates
+        function mergeDataByAdminNo(data) {
+            const uniqueData = [];
+            const seenAdminNo = new Set();
+
+            for (let item of data) {
+                if (!seenAdminNo.has(item.admin_no)) {
+                    uniqueData.push(item);
+                    seenAdminNo.add(item.admin_no);
+                }
+            }
+            return uniqueData;
+        }    
+    </script>
+</body>
+
+</html>

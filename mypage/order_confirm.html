@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Web発注システム</title>
+    <link rel="icon" type="image/png" href="../images/sitelogo.png" />
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/order_detail.css" />
+    <script src="../js/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+    <!-- header -->
+    <div class="container-logo">
+        <nav class="nav-logo">
+            <img src="../images/tennic-logo.png" alt="Logo" />
+        </nav>
+
+        <nav class="navbar-50">
+            <span class="text-white">スポーツハウス アローザ </span>
+        </nav>
+    </div>
+
+    <div class="main-container">
+        <!-- left menu -->
+        <aside>
+            <div class="container mt-2 position-relative ">
+                <button class="btn btn-primary mb-4 d-flex justify-content-between align-items-center rounded-0"
+                    onclick="location.href='./order_detail.html'">
+                    <span class="mx-auto">直接入力</span>
+                    <img src="../images/chevron-right.svg">
+                </button>
+                <hr>
+
+                <div class="mb-4 text-center">
+                    <label class="form-label">品番</label>
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                </div>
+
+                <div class="mb-3 text-center">
+                    <label class="form-label text-decoration-underline">ブランド選択</label>
+                    <div class="d-inline-block position-relative mb-2">
+                        <div class="form-control rounded-0 f2f2-bg tooltip-input" onmouseover="showTooltip(this)"
+                            onmouseout="hideTooltip(this)">
+                            ヨネックス
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-center">
+                    <label class="form-label text-decoration-underline">カテゴリ選択</label>
+                    <div class="d-inline-block position-relative mb-2">
+                        <div class="form-control rounded-0 f2f2-bg tooltip-input" onmouseover="showTooltip(this)"
+                            onmouseout="hideTooltip(this)">
+                            アクセサリ、シューズ
+                        </div>
+                    </div>
+                </div>
+
+
+                <button class="btn btn-primary mb-4 d-flex justify-content-between align-items-center rounded-0">
+                    <span class="mx-auto">検索</span>
+                    <img src="../images/chevron-right.svg">
+                </button>
+                <hr>
+            </div>
+
+            <label class="form-label mt-2">一括注文</label>
+            <button class="btn btn-primary mb-2 d-flex justify-content-between align-items-center rounded-0">
+                <span class="mx-auto">CSV選択</span>
+                <img src="../images/chevron-right.svg">
+            </button>
+
+            <label class="form-label text-decoration-underline mb-5">一括注文とは？</label>
+
+            <nav class="nav flex-column nav-list">
+                <a class="nav-link text-white position-relative" href="./home.html">
+                    <img src="../images/house-door-fill.svg" class="me-3"> ホーム
+                </a>
+                <a class="nav-link text-white position-relative" href="./order_history.html">
+                    <img src="../images/file-earmark-text-fill.svg" class="me-3">注文履歴</a>
+                <a class="nav-link text-white position-relative" href="./setting.html">
+                    <img src="../images/gear_fill_menu.svg" class="me-3">設定</a>
+                <a class="nav-link text-white position-relative nav-link-after" href="#">
+                    <img src="../images/box-arrow-left.svg" class="me-2">ログアウト</a>
+            </nav>
+        </aside>
+
+        <main class="flex-grow-1">
+            <div class="order-confirm">
+                <div class="container-fluid">
+                    <div class="width-order-confirm">
+                        <div class="confirm-label">
+                            <label>注文確認画面の表示</label>
+                        </div>
+                        <table class="custom-table table-bordered">
+                            <thead class="text-center table-dark order-thead">
+                                <tr>
+                                    <th rowspan="2" class="width-151">品番</th>
+                                    <th colspan="3" class="width-737">商品名</th>
+                                    <th class="width-120">注文数</th>
+                                    <th class="width-150">単価</th>
+                                    <th class="width-232">金額</th>                                   
+                                </tr>
+                                <tr>
+                                    <th class="width-372">ブランド</th>
+                                    <th class="width-240">カラー</th>
+                                    <th class="width-200">サイズ</th>
+                                    <th colspan="3" class="width-82">摘要</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <table id="productTable" class="table-bordered product-container mt-4">
+                            <tbody class="tbody-b-c">
+                                <!-- Rows will be added here -->
+                            </tbody>
+                        </table>
+
+                        <div class="total mt-3">
+                            <label class="text-primary mx-4">注文金額合計</label>
+                            <div class="form-control rounded-0 me-4" id="total-amount">
+                                &#165;0
+                            </div>
+                        </div>
+
+                        <div class="container-main-content">
+                            <div class="main-content-left">
+                                <label>注文備考欄</label>
+                                <textarea id="order-note" rows="5" cols="50" class="text-area order-note text-black"
+                                    disabled></textarea>
+                            </div>
+
+                            <div class="main-content-right">
+                                <div class="main-content-sub-left confirm-main-content-sub-left">
+                                    <label for="shipping-default">配送先</label>
+                                    <select name="shipping_default" id="shipping-default" disabled>
+                                        <option value="option1">スポーツハウス アローザ 1</option>
+                                        <option value="option2">スポーツハウス アローザ 2</option>
+                                        <option value="option3">スポーツハウス アローザ 3</option>
+                                        <option value="option4">スポーツハウス アローザ 4</option>
+                                    </select>
+
+                                </div>
+                                <div class="main-content-sub-right">
+                                    <!-- Postal Code -->
+                                    <div class="align-items-center mt-3 gap-1 d-flex">
+                                        <label for="zip1">郵便番号</label>
+                                        <div id="zip1" class="zip1"></div>
+                                        <span>-</span>
+                                        <div id="zip2" class="zip2"></div>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="address-container">
+                                        <div class="address-row">
+                                            <label for="address1" class="label-text">住所</label>
+                                            <div id="address1" class="address1 tooltip-input"
+                                                onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"></div>
+                                        </div>
+                                        <div class="address-row">
+                                            <label for="address2" class="label-text"></label>
+                                            <div id="address2" class="address2 tooltip-input"
+                                                onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Phone Number -->
+                                    <div class="d-flex align-items-center gap-1">
+                                        <label for="Tel1">電話番号</label>
+                                        <div class="phone-number-container">
+                                            <div id="Tel1" class="tel-input"></div>
+                                            <span>-</span>
+                                            <div id="Tel2" class="tel-input"></div>
+                                            <span>-</span>
+                                            <div id="Tel3" class="tel-input"></div>
+                                        </div>
+                                    </div>
+                                    <p>※情報に誤りがある場合はお手数ですがテニックまでご連絡ください。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="confirm-btn-center">
+                            <button
+                                class="btn btn-primary d-flex justify-content-between align-items-center rounded-0 mt-4 me-4"
+                                id="backToDetail">
+                                <span class="mx-auto"> 注文明細に戻る</span>
+                            </button>
+                            <button
+                                class="btn btn-primary d-flex justify-content-between align-items-center rounded-0 mt-4"
+                                id="goToComplete">
+                                <span class="mx-auto">注文する</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        </main>
+    </div>
+
+    <!-- Popup Overlay -->
+    <div id="popupOverlay" class="popup-overlay">
+        <div id="popupContent" class="popup-content">
+          <!-- Loading View -->
+          <div id="loadingView">
+            <p id="popupMessage1">ただいま注文処理中です。 <br> しばらくお待ちください。</p>
+            <p id="popupMessage2">
+               ブラウザは閉じないでください。
+            </p>
+            <img id="popupImage" src="../images/spinner.gif" alt="注文中アニメーション" class="popup-image mt-4" />
+            <div id="progressBar" class="progress-bar">
+              <div id="ProgressBar" class="sub-progress-bar"></div>
+            </div>
+          </div>      
+          <!-- Error View -->
+          <div id="errorView">
+            <img src="../images/exclamation-circle.svg" id="errorSvg" class="exclam-svg">
+            <p id="errorMessage" class="error-message mt-5 mb-4">
+              注文に失敗しました。もう一度お試しください。
+            </p>
+            <button id="closeBtn" class="close-loading-btn btn btn-danger align-items-center justify-content-center rounded-0 mt-3">
+              閉じる
+            </button>
+          </div>      
+        </div>
+      </div> 
+    <script>
+       /**
+        * Displays a tooltip with the text content of an element.
+        * The tooltip appears if the text overflows the element.
+        * 
+        * @param {HTMLElement} element - The element that triggers the tooltip.
+        */
+        function showTooltip(element) {
+            let tooltip = document.querySelector('.tooltip-box');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.classList.add('tooltip-box');
+                document.body.appendChild(tooltip);
+            }
+
+            tooltip.textContent = element.textContent.trim();
+            if (element.scrollWidth - element.clientWidth > 0) {
+                const rect = element.getBoundingClientRect();
+                tooltip.style.display = 'block';
+                tooltip.style.top = `${rect.top + window.scrollY + element.offsetHeight + 15}px`;
+                tooltip.style.left = `${rect.left + window.scrollX}px`;
+
+                let tooltipRect = tooltip.getBoundingClientRect();
+                const windowWidth = window.innerWidth;
+
+                if (tooltipRect.right > windowWidth) {
+                    let currentLeft = parseInt(tooltip.style.left) || 0;
+                    let newLeft = currentLeft - (tooltipRect.right - windowWidth) - 50;
+                    tooltip.style.left = `${newLeft}px`;
+
+                    tooltipRect = tooltip.getBoundingClientRect();
+
+                    let arrowLeft = rect.left - tooltipRect.left + element.offsetWidth / 4 - 15;
+                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+                } else {
+                    let arrowLeft = element.offsetWidth / 4 - 15;
+                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+                }
+            } else {
+                tooltip.style.display = 'none';
+            }
+        }
+        // Hides the tooltip when the mouse leaves the element.
+        function hideTooltip() {
+            const tooltip = document.querySelector('.tooltip-box');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+        let productRowsData = [];
+        let userData = "";
+        let orderNote = "";
+
+        // Wait for the DOM to be ready before executing script
+        $(document).ready(function () {
+            // Retrieves and decodes URL query parameters (productData, orderNote, userData), and populates relevant fields.
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+            const encodedData = getQueryParam('productData');
+            const encodedOrderNote = getQueryParam('orderNote');
+            const encodedUserData = getQueryParam('userData');
+
+            if (encodedUserData) {
+                const decodedUserData = decodeURIComponent(encodedUserData);                
+                userData = JSON.parse(decodedUserData);
+                $('#shipping-default').val(userData.option);
+                $('#zip1').text(userData.zip1);
+                $('#zip2').text(userData.zip2);
+                $('#Tel1').text(userData.tel1);
+                $('#Tel2').text(userData.tel2);
+                $('#Tel3').text(userData.tel3);
+                $('#address1').text(userData.address1);
+                $('#address2').text(userData.address2);
+            }
+            if (encodedOrderNote) {
+                orderNote = decodeURIComponent(encodedOrderNote);
+                $('#order-note').text(orderNote);
+            }
+            if (encodedData) {
+                productRowsData = JSON.parse(decodeURIComponent(encodedData));
+                let tableBody = $("#productTable tbody");
+                productRowsData.forEach(function (product) {
+                    let firstRow = $(`
+                <tr>
+                    <td class="width-151 bag">
+                       <span class="text-start input-h-b">${product.product_id}</span>
+                    </td>
+                    <td colspan="3" class="width-737 td-bag product-name tooltip-input" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                        ${product.product_name}
+                    </td>
+                    <td class="width-120 bag">
+                       <span class="readonly-text text-end input-h-b">${product.order_instock || "0"}</span>
+                    </td>
+                    <!-- Display product price with Yen symbol (&#165;) -->
+                    <td class="width-150 td-bag product-price text-end text-nowrap">&#165;${product.price.toLocaleString()}</td>
+                    <td class="width-232 td-bag total-price text-end text-nowrap"></td>                   
+                </tr>
+            `);
+                    let secondRow = $(`
+                <tr>
+                    <td class="width-151 text-center td-bag">
+                        <button type="button" class="btn btn-primary text-white edit-button-hide rounded-0">編集</button>
+                    </td>
+                    <td class="width-372 td-bag tooltip-input brand-name" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                        ${product.brand_name}
+                    </td>
+                    <td class="width-240 product-color-container tooltip-input bag" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                        <!-- Display product color; if not available, show em dash (&#8212;) -->
+                        <span class="text-left p-r-l">${product.color ? product.color : '&#8212;'}</span>
+                    </td>
+                    <td class="width-200 product-size-container tooltip-input bag" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                        <!-- Display product size; if not available, show em dash (&#8212;) -->
+                        <span class="text-left p-r-l">${product.size ? product.size : '&#8212;'}</span>
+                    </td>
+                    <td colspan="3" class="width-502 tooltip-input bag" onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                      <span class="text-left p-r-l">${product.order_remark}</span>
+                    </td>
+                </tr>
+            `);
+                    // Display the total price with a Yen symbol (&#165;) and format the number with commas
+                    firstRow.find(".total-price").html(`&#165;${product.totalPrice.toLocaleString()}`);
+                    let gapRow = $("<tr class='gap-row'><td colspan='8'></td></tr>");
+                    tableBody.append(firstRow);
+                    tableBody.append(secondRow);
+                    tableBody.append(gapRow);
+                    updateTotalAmount();
+                });
+            }
+        })
+        // Calculates and updates the total amount by summing all prices in elements with class "total-price".
+        let totalAmount = 0;
+        function updateTotalAmount() {
+            totalAmount = 0;
+            $(".total-price").each(function () {
+                // In HTML, ¥ is &#165;, but in text(), it appears as \u00A5 (Unicode for ¥).
+                let priceText = $(this).text().replace(/\u00A5/, "").replace(/,/g, "");
+                let price = parseFloat(priceText) || 0;
+                totalAmount += price;
+            });
+            $("#total-amount").html(`&#165;${totalAmount.toLocaleString()}`);
+        }
+        // Click event for going back to order details with encoded data and loading popup
+        $('#backToDetail').on('click', function () {
+            const encodedData = encodeURIComponent(JSON.stringify(productRowsData));
+            const encodedNote = encodeURIComponent(orderNote);
+            const encodedUser = encodeURIComponent(JSON.stringify(userData));
+            const backUrl = `./order_detail.html?productData=${encodedData}&orderNote=${encodedNote}&userData=${encodedUser}`;
+            window.location.href = backUrl;
+        });
+
+      // Click event for completing the order and storing data in localStorage
+      $('#goToComplete').click(function () {
+        const popupOverlay = document.getElementById("popupOverlay");
+        const loadingView = document.getElementById("loadingView");
+        const errorView = document.getElementById("errorView");
+        const closeBtn = document.getElementById("closeBtn");
+
+        // Show popup overlay
+        popupOverlay.style.display = "flex";
+
+        // Show loading view, hide error view
+        loadingView.style.display = "block";
+        errorView.style.display = "none";
+
+        // Simulate delay (adjusted to 5 seconds for realism)
+        setTimeout(() => {
+            const errStatus = false; // ← Change manually for testing
+
+            if (errStatus) {
+            // Show error view
+            loadingView.style.display = "none";
+            errorView.style.display = "block";
+            } else {
+            // Success: store data and redirect
+            localStorage.setItem("productRowsData", JSON.stringify(productRowsData));
+            localStorage.setItem("userData", JSON.stringify(userData));
+            localStorage.setItem("orderNote", orderNote);
+            localStorage.setItem("totalAmount", totalAmount);
+            window.location.href = './order_complete.html';
+            }
+        }, 5000); // 5 seconds
+
+        // Close button event
+        closeBtn.onclick = () => {
+            popupOverlay.style.display = "none";
+        };
+        });
+   
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Web発注システム</title>
+    <link rel="icon" type="image/png" href="../images/sitelogo.png" />
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/order_detail.css" />
+    <script src="../js/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+    <!-- header -->
+    <div class="container-logo">
+        <nav class="nav-logo">
+            <img src="../images/tennic-logo.png" alt="Logo" />
+        </nav>
+
+        <nav class="navbar-50">
+            <span class="text-white">スポーツハウス アローザ </span>
+        </nav>
+    </div>
+
+    <div class="main-container">
+        <!-- left menu -->
+        <aside>
+            <div class="container mt-2 position-relative ">
+                <button class="btn btn-primary mb-4 d-flex justify-content-between align-items-center rounded-0"
+                    onclick="location.href='./order_detail.html'">
+                    <span class="mx-auto">直接入力</span>
+                    <img src="../images/chevron-right.svg">
+                </button>
+                <hr>
+
+                <div class="mb-4 text-center">
+                    <label class="form-label">品番</label>
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                    <input type="text" class="form-control rounded-0" />
+                </div>
+
+                <div class="mb-3 text-center">
+                    <label class="form-label text-decoration-underline">ブランド選択</label>
+                    <div class="d-inline-block position-relative mb-2">
+                        <div class="form-control rounded-0 f2f2-bg tooltip-input" onmouseover="showTooltip(this)"
+                            onmouseout="hideTooltip(this)">
+                            ヨネックス
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-center">
+                    <label class="form-label text-decoration-underline">カテゴリ選択</label>
+                    <div class="d-inline-block position-relative mb-2">
+                        <div class="form-control rounded-0 f2f2-bg tooltip-input" onmouseover="showTooltip(this)"
+                            onmouseout="hideTooltip(this)">
+                            アクセサリ、シューズ
+                        </div>
+                    </div>
+                </div>
+
+
+                <button class="btn btn-primary mb-4 d-flex justify-content-between align-items-center rounded-0">
+                    <span class="mx-auto">検索</span>
+                    <img src="../images/chevron-right.svg">
+                </button>
+                <hr>
+            </div>
+
+            <label class="form-label mt-2">一括注文</label>
+            <button class="btn btn-primary mb-2 d-flex justify-content-between align-items-center rounded-0">
+                <span class="mx-auto">CSV選択</span>
+                <img src="../images/chevron-right.svg">
+            </button>
+
+            <label class="form-label text-decoration-underline mb-5">一括注文とは？</label>
+
+            <nav class="nav flex-column nav-list">
+                <a class="nav-link text-white position-relative" href="./home.html">
+                    <img src="../images/house-door-fill.svg" class="me-3"> ホーム
+                </a>
+                <a class="nav-link text-white position-relative" href="./order_history.html">
+                    <img src="../images/file-earmark-text-fill.svg" class="me-3">注文履歴</a>
+                <a class="nav-link text-white position-relative" href="./setting.html">
+                    <img src="../images/gear_fill_menu.svg" class="me-3">設定</a>
+                <a class="nav-link text-white position-relative nav-link-after" href="#">
+                    <img src="../images/box-arrow-left.svg" class="me-2">ログアウト</a>
+            </nav>
+        </aside>
+
+        <main class="flex-grow-1">
+            <div class="order-complete">
+                <div class="container-fluid">
+                    <div class="width-order-complete">
+                        <div class="complete-label">
+                            <label> ご注文ありがとうございました。<br>
+                                注文番号は <span class="orderNumber">W123456789</span>です。<br>
+                                注文内容は以下の通りです。
+                            </label>
+                        </div>
+                        <button onclick="openDeleteConfirmModal()"
+                            class="btn btn-primary mb-2 d-flex justify-content-between align-items-center rounded-0 btn-bg"
+                            id="CancelTextButton">
+                            <span class="mx-auto">注文キャンセル</span>
+                        </button>
+
+                        <table class="custom-table table-bordered">
+                            <thead class="text-center table-dark order-thead">
+                                <tr>
+                                    <th rowspan="2" class="width-84">
+                                        <input type="checkbox" class="form-check-input" id="checkAll"
+                                            onchange="checkAllCheckBox(this)" />
+                                    </th>
+
+                                    <th rowspan="2" class="width-167">品番</th>
+                                    <th colspan="3" class="width-573">商品名</th>
+                                    <th class="width-90">注文数</th>
+                                    <th class="width-140">単価</th>
+                                    <th class="width-120">金額</th>
+                                    <th class="width-70 p-0">引当数</th>
+                                    <th class="width-86 p-0">引当結果</th>
+                                    <th class="width-136 p-0">入荷予定日</th>
+                                </tr>
+                                <tr>
+                                    <th class="width-297">ブランド</th>
+                                    <th class="width-136">カラー</th>
+                                    <th class="width-140">サイズ</th>
+                                    <th colspan="6" class="width-642">摘要</th>
+                                </tr>
+                            </thead>
+                        </table>
+
+                        <table id="productTable" class="table-bordered product-container mt-4">
+                            <tbody class="order-complete-tbody-b-c">
+                                <!-- Rows will be added here -->
+                            </tbody>
+                        </table>
+
+                        <div class="total mt-3">
+                            <label class="text-primary mx-4">注文金額合計</label>
+                            <div class="form-control rounded-0 me-4" id="total-amount">
+                                &#165;0
+                            </div>
+                        </div>
+
+                        <div class="container-main-content">
+                            <div class="main-content-left">
+                                <label>注文備考欄</label>
+                                <textarea id="order-note" rows="5" cols="50" class="text-area order-note text-black"
+                                    disabled></textarea>
+                                </textarea>
+                            </div>
+
+                            <div class="main-content-right">
+                                <div class="main-content-sub-left complete-main-content-sub-left">
+                                    <label for="shipping-default">配送先</label>
+                                    <select name="shipping_default" id="shipping-default" disabled>
+                                        <option value="option1">スポーツハウス アローザ 1</option>
+                                        <option value="option2">スポーツハウス アローザ 2</option>
+                                        <option value="option3">スポーツハウス アローザ 3</option>
+                                        <option value="option4">スポーツハウス アローザ 4</option>
+                                    </select>
+
+                                </div>
+                                <div class="main-content-sub-right">
+                                    <!-- Postal Code -->
+                                    <div class="align-items-center mt-3 gap-1 d-flex">
+                                        <label for="zip1">郵便番号</label>
+                                        <div id="zip1" class="zip1"></div>
+                                        <span>-</span>
+                                        <div id="zip2" class="zip2"></div>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="address-container">
+                                        <div class="address-row">
+                                            <label for="address1" class="label-text">住所</label>
+                                            <div id="address1" class="address1 tooltip-input"
+                                                onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"></div>
+                                        </div>
+                                        <div class="address-row">
+                                            <label for="address2" class="label-text"></label>
+                                            <div id="address2" class="address2 tooltip-input"
+                                                onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Phone Number -->
+                                    <div class="d-flex align-items-center gap-1">
+                                        <label for="Tel1">電話番号</label>
+                                        <div class="phone-number-container">
+                                            <div id="Tel1" class="tel-input"></div>
+                                            <span>-</span>
+                                            <div id="Tel2" class="tel-input"></div>
+                                            <span>-</span>
+                                            <div id="Tel3" class="tel-input"></div>
+                                        </div>
+                                    </div>
+                                    <p>※情報に誤りがある場合はお手数ですがテニックまでご連絡ください。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+        </main>
+    </div>
+    <!-- product modal -->
+    <div id="overlay" class="overlay"></div>
+    <div id="productModal" class="modal">
+        <button type="button" class="btn-close position-absolute closebtn-for-popup" id="closeBtn"></button>
+        <div class="model-header mb-5">
+            <label id="productId"></label>
+            <p>注文する商品名を選択してください。</p>
+        </div>
+        <table class="product-table table-bordered mb-4">
+            <thead class="text-center table-dark product-thead">
+                <tr>
+                    <th>ブランド</th>
+                    <th>商品名</th>
+                </tr>
+            </thead>
+            <tbody id="productList"></tbody>
+        </table>
+
+        <div class="center-container">
+            <button type="button" class="btn btn-primary text-white rounded-0 mt-5" id="closeModalBtn">
+                閉じる
+            </button>
+        </div>
+
+    </div>
+    <!-- delete modal -->
+    <div class="delete-overlay" id="deleteOverlay"></div>
+    <div class="delete-modal" id="deleteModal">
+        <h6>この行を削除してもよろしいですか?</h6>
+        <button type="button" class="del-btn mt-4" id="closeDeleteModal">キャンセル</button>
+        <button type="button" class="del-btn text-danger mt-4" id="confirmDelete">消去</button>
+    </div>
+    <!-- confirmModal -->
+    <div id="confirmModal">
+        <!-- <div class="modal-header">確認</div> -->
+        <div class="modal-body justify-content-center">選択した商品の注文をキャンセルします。</br>よろしいですか？</div>
+        <div class="modal-footer d-flex d-flex-row justify-content-between mt-4">
+            <button class="btn btn-danger d-flex align-items-center justify-content-center rounded-0" id="confirmYes"
+                onclick="UpdateText()">はい</button>
+            <button class="btn btn-secondary d-flex align-items-center justify-content-center rounded-0"
+                id="closeConfirmModal">いいえ</button>
+        </div>
+    </div>
+    <script>
+        let productDataComplete = [
+            {
+                product_id: "10604",
+                product_name: "ランニングシューズ（10604）",
+                brand_name: "ランニングマスター",
+                reserved_amount: 25,
+                arrival_date: "2024/01/05",
+                color: "ブルー",
+                size: "M",
+                price: 4200,
+                order_instock: 8,
+                totalPrice: 33600,
+                remark: "Order 8 pairs of size M in blue. / ブルーのMサイズを8足注文。"
+            },
+            {
+                product_id: "10604",
+                product_name: "ランニングシューズ（10604）",
+                brand_name: "ランニングマスター",
+                reserved_amount: 10,
+                arrival_date: "2024/01/05",
+                color: "ブルー",
+                size: "L",
+                price: 4200,
+                order_instock: 10,
+                totalPrice: 42000,
+                remark: "Order 10 pairs of size L in blue. / ブルーのLサイズを10足注文。"
+            },
+            {
+                product_id: "10604",
+                product_name: "ランニングシューズ（10604）",
+                brand_name: "ランニングマスター",
+                reserved_amount: 25,
+                arrival_date: "2024/01/05",
+                color: "レッド",
+                size: "M",
+                price: 4500,
+                order_instock: 5,
+                totalPrice: 22500,
+                remark: "Order 5 pairs of size M in red. / レッドのMサイズを5足注文。"
+            },
+            {
+                product_id: "10604",
+                product_name: "ランニングシューズ（10604）",
+                brand_name: "ランニングマスター",
+                reserved_amount: 25,
+                arrival_date: "2024/01/05",
+                color: "レッド",
+                size: "L",
+                price: 4500,
+                order_instock: 7,
+                totalPrice: 31500,
+                remark: "Order 7 pairs of size L in red. / レッドのLサイズを7足注文。"
+            },
+            {
+                product_id: "10604",
+                product_name: "ランニングシューズ（10604）",
+                brand_name: "ランニングマスター",
+                reserved_amount: 10,
+                arrival_date: "2024/01/05",
+                color: "ブルー",
+                size: "L",
+                price: 4200,
+                order_instock: 10,
+                totalPrice: 42000,
+                remark: "Order 10 pairs of size L in blue. / ブルーのLサイズを10足注文。"
+            },
+            {
+                product_id: "10604",
+                product_name: "ランニングシューズ（10604）",
+                brand_name: "ランニングマスター",
+                reserved_amount: 25,
+                arrival_date: "2024/01/05",
+                color: "レッド",
+                size: "M",
+                price: 4500,
+                order_instock: 5,
+                totalPrice: 22500,
+                remark: "Order 5 pairs of size M in red. / レッドのMサイズを5足注文。"
+            },
+            {
+                product_id: "10604",
+                product_name: "ランニングシューズ（10604）",
+                brand_name: "ランニングマスター",
+                reserved_amount: 0,
+                arrival_date: "2024/01/05",
+                color: "レッド",
+                size: "L",
+                price: 4500,
+                order_instock: 7,
+                totalPrice: 31500,
+                remark: "Order 8 pairs of sizeblue.サイズを8足注文文。ee4444444444eeeeee4444e5551234567"
+            }
+        ];
+        // Sets the text of the first element with class "orderNumber" to the given order number.
+        let orderNumber = "W12345677345";
+        document.getElementsByClassName("orderNumber")[0].innerText = orderNumber;
+        // Initializes modal open/close handlers for confirmation and delete modals on page load.
+        // Also triggers `displayData()` to render stored product info when the DOM is ready.
+        document.addEventListener("DOMContentLoaded", function () {
+            window.openDeleteConfirmModal = function (element) {
+                targetRow = element;
+                document.getElementById('confirmModal').style.display = 'block';
+                document.getElementById('deleteOverlay').style.display = 'block';
+            };
+            document.getElementById("closeConfirmModal").addEventListener("click", function () {
+                document.getElementById('confirmModal').style.display = 'none';
+                document.getElementById('deleteOverlay').style.display = 'none';
+            });
+            document.getElementById("closeDeleteModal").addEventListener("click", function () {
+                document.getElementById('deleteModal').style.display = 'none';
+                document.getElementById('deleteOverlay').style.display = 'none';
+            });
+
+            displayData();
+        });
+        // Binds checkbox events to enable or disable the cancel button based on selection.
+        // It checks if any individual checkbox or the "check all" box is selected.
+        function bindCheckboxEvents() {
+            // const checkboxes = document.querySelectorAll('.check-input');
+            const checkboxes = Array.from(document.querySelectorAll('.check-input'));
+
+            const checkAll = document.getElementById("checkAll");
+            const cancelButton = document.getElementById("CancelTextButton");
+
+            function toggleCancelButton() {
+
+                const anyChecked = document.querySelector('.check-input:checked') !== null;
+                const isCheckAllChecked = checkAll.checked;
+
+                cancelButton.disabled = !(anyChecked || isCheckAllChecked);
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', toggleCancelButton);
+            });
+
+            checkAll.addEventListener('change', toggleCancelButton);
+            toggleCancelButton(); // Initial check
+        }
+        // Cancels selected products by marking their variants as "cancelled" in localStorage and updating the UI.
+        $(document).ready(function () {
+            window.UpdateText = function () {
+                let productData = JSON.parse(localStorage.getItem("productRowsData")) || [];
+                let canceltextButton = document.getElementsByClassName(".CancelTextButton");
+
+                $(".form-check-input:checked").each(function () {
+                    let row = $(this).closest("tr");
+                    // let productId = row.find(".product-id").text().trim();
+                    let adminNo = row.find(".admin-no").text().trim();
+                    row.find(".cancel-text").removeClass("d-none");
+                    row.find(".form-check-input").hide();
+                    canceltextButton.disabled = true;
+                    
+                    productData.forEach(product => {
+                        product.variants?.forEach(variant => {
+                            if (variant.admin_no === adminNo) {
+                                variant.cancelled = true;
+                            }
+                        });
+                    });
+                });
+                document.getElementById('confirmModal').style.display = 'none';
+                document.getElementById('deleteOverlay').style.display = 'none';
+                const cancelButton = document.getElementById("CancelTextButton");
+                if (cancelButton) {
+                    cancelButton.disabled = true;
+                }
+            }
+        });
+
+        // Check all checkboxes
+        function checkAllCheckBox(myCheckBox) {
+            let checkBoxes = document.querySelectorAll("input[type='checkbox']:not(#checkAll)"); // Exclude the "Check All" checkbox
+
+            checkBoxes.forEach((checkbox) => {
+                checkbox.checked = myCheckBox.checked;
+            });
+        }
+        // Sets stock status text and color (OK, Partial, NG) based on reserved vs. ordered quantity after page load.
+        document.addEventListener('DOMContentLoaded', () => {
+            // Status constants
+            const STATUS_OK = "引当OK";
+            const STATUS_PARTIAL = "一部引当OK"; //yellow
+            const STATUS_NG = "引当NG"; //red
+
+            // Select all rows with `.clr-table1` status spans
+            const rows = document.querySelectorAll('.clr-table1');
+
+            rows.forEach((statusSpan) => {
+                // Find the closest row
+                const row = statusSpan.closest('tr');
+
+                // Get the reserved amount from the row
+                const reservedAmount = parseInt(row.querySelector('.reserved-amound')?.textContent || '0', 10);
+
+                // Get the order in stock value from the row
+                const orderInstock = parseInt(row.querySelector('.order-instock')?.textContent || '0', 10);
+
+                // Set the reserved amount to the instock-compare cell
+
+                // Determine the status based on the values
+                let status;
+                let bgColor;
+                if (reservedAmount <= 0) {
+                    status = STATUS_NG;
+                    bgColor = "#ff0000";
+
+                } else if (orderInstock === reservedAmount) {
+                    status = STATUS_OK;
+                    bgColor = "#4590D4";
+                } else if (orderInstock < reservedAmount) {
+                    status = STATUS_PARTIAL;
+                    bgColor = "#FFA51E";
+                }
+
+                // Apply the status
+                statusSpan.textContent = status;
+                statusSpan.style.setProperty('background-color', bgColor, 'important');
+            });
+        });
+
+
+        // Displays saved product, user, and order note data from localStorage and populates the table with formatted rows.
+        function displayData() {
+            let table = document.querySelector("#productTable tbody");
+            table.innerHTML = ''; // Clear existing content
+
+            let productData = localStorage.getItem("productRowsData");
+            let totalAmount = localStorage.getItem("totalAmount");
+            $("#total-amount").html(`&#165;${Number(totalAmount).toLocaleString('ja-JP')}`);
+            let getOrderNote = localStorage.getItem("orderNote");
+            let getUserData = localStorage.getItem("userData");
+
+            if (getOrderNote) {
+                $('#order-note').text(getOrderNote);
+            }
+            if (getUserData) {
+                const userData = JSON.parse(getUserData);
+                $('#shipping-default').val(userData.option);
+                $('#zip1').text(userData.zip1);
+                $('#zip2').text(userData.zip2);
+                $('#Tel1').text(userData.tel1);
+                $('#Tel2').text(userData.tel2);
+                $('#Tel3').text(userData.tel3);
+                $('#address1').text(userData.address1);
+                $('#address2').text(userData.address2);
+            }
+
+            if (productDataComplete) {
+
+                productDataComplete.forEach(product => {
+                    let firstRow = document.createElement("tr");
+                    firstRow.innerHTML = `
+               <td class="width-84 text-center border-cell" rowspan="2">
+                      <input type="checkbox" class="check-input form-check-input"  ${product.cancelled ? 'style="display:none;"' : ''} /> 
+                        <span class="cancel-text ${product.cancelled ? '' : 'd-none'}">キャンセル済み</span>
+                </td>
+                <td class=" td-bag product-id width-167">
+                    <span class="product-id">${product.product_id}</span>
+                </td>                
+                <td colspan="3" class="td-bag tooltip-input width-573" 
+                    onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                    ${product.product_name}
+                </td>
+                <td class="width-90 td-bag text-end">
+                    <span class="order-instock ">${product.order_instock || "0"}</span>
+                </td>
+                <td class="width-140 td-bag product-price text-end">
+                    <span>&#165; ${product.price.toLocaleString()}</span>
+                </td>
+                <td class="width-120 td-bag total-price text-end">
+                    <span> &#165; ${product.totalPrice.toLocaleString()}</span>
+                </td>
+                
+                <td class="width-70  td-bag reserved-amound text-end"> ${product.reserved_amount}</td>
+                    <td class="width-90 clr-table bag">
+                        <span class="clr-table1 text-white td-bag">引当OK</span>
+                        </div>
+                    </td>
+                    <td class="width-136 td-bag">${product.arrival_date}</td>
+                `;
+
+
+                    let secondRow = document.createElement("tr");
+                    secondRow.innerHTML = `
+                <td class="width-151 text-center td-bag">
+                    <button type="button" class="btn btn-primary text-white edit-button-hide rounded-0">編集</button>
+                </td>
+                <td class="width-297 td-bag tooltip-input brand-name" 
+                    onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                    <span>${product.brand_name}</span>
+                </td>
+                <td class="width-136 product-color-container px-7px bag tooltip-input"  onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                    <!-- Display product color; if not available, show em dash (&#8212;) as a placeholder -->
+                    <span>${product.color ? product.color : '&#8212;'}</span>
+                </td>
+                <td class="width-140 product-size-container px-7px bag tooltip-input"  onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                <!-- Display product size; if not available, show em dash (&#8212;) as a placeholder -->
+                    <span>${product.size ? product.size : '&#8212;'}</span>
+                </td>              
+                <td colspan="6" class="order-complete-remark tooltip-input px-7px bag" 
+                    onmouseover="showTooltip(this)" onmouseout="hideTooltip(this)">
+                    <span>${product.remark}</span>
+                </td>`;
+
+                    let gapRow = document.createElement("tr");
+                    gapRow.classList.add("gap-row");
+                    gapRow.innerHTML = `<td colspan="8" class="gap-row-td"></td>`;
+
+                    table.appendChild(firstRow);
+                    table.appendChild(secondRow);
+                    table.appendChild(gapRow);
+                });
+                bindCheckboxEvents();
+
+            }
+        }
+        /**
+       * Displays a tooltip with the text content of an element.
+       * The tooltip appears if the text overflows the element.
+       * 
+       * @param {HTMLElement} element - The element that triggers the tooltip.
+       */
+        function showTooltip(element) {
+            let tooltip = document.querySelector('.tooltip-box');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.classList.add('tooltip-box');
+                document.body.appendChild(tooltip);
+            }
+
+            tooltip.textContent = element.textContent.trim();
+            if (element.scrollWidth - element.clientWidth > 0) {
+                const rect = element.getBoundingClientRect();
+                tooltip.style.display = 'block';
+                tooltip.style.top = `${rect.top + window.scrollY + element.offsetHeight + 15}px`;
+                tooltip.style.left = `${rect.left + window.scrollX}px`;
+
+                let tooltipRect = tooltip.getBoundingClientRect();
+                const windowWidth = window.innerWidth;
+
+                if (tooltipRect.right > windowWidth) {
+                    let currentLeft = parseInt(tooltip.style.left) || 0;
+                    let newLeft = currentLeft - (tooltipRect.right - windowWidth) - 50;
+                    tooltip.style.left = `${newLeft}px`;
+
+                    tooltipRect = tooltip.getBoundingClientRect();
+
+                    let arrowLeft = rect.left - tooltipRect.left + element.offsetWidth / 4 - 15;
+                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+                } else {
+                    let arrowLeft = element.offsetWidth / 4 - 15;
+                    tooltip.style.setProperty('--tooltip-arrow-left', `${arrowLeft}px`);
+                }
+            } else {
+                tooltip.style.display = 'none';
+            }
+        }
+
+        // Hides the tooltip when the mouse leaves the element.
+        function hideTooltip() {
+            const tooltip = document.querySelector('.tooltip-box');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
