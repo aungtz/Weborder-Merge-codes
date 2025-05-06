@@ -363,6 +363,18 @@ function hideTooltip(el) {
 }
 
 $(document).ready(function () {
+    // categoryModel
+    $(".category-model-open").click(function () {
+        console.log("Category model open clicked");
+    $("#categoryModel").fadeIn(300); // 300ms animation
+    $("#CategoryOverlay").fadeIn(300); // 300ms animation
+    });     
+    
+       // Close the modal with fade out
+$("#closeBtn, #closeModalBtn").click(function () {
+    $("#categoryModel").fadeOut(300); // 300ms animation
+    $("#CategoryOverlay").fadeOut(300); // 300ms animation
+});
     //csv modal 
     $(document).on("click", "#CSV-popup", function () {
         $(" #CSVmodal").fadeIn();
@@ -491,45 +503,8 @@ function hideTooltip() {
     }
 }
 
-$(document).ready(function () {
-
-    // Highlight active navigation link
-    let currentPage = window.location.pathname.split("/").pop();
-    $(".nav-list .nav-link").removeClass("active-nav");
-    $('.nav-list .nav-link[href="./' + currentPage + '"]').addClass("active-nav");
-});
-
-function switchTab(tabNumber) {
-    $('.nav-link').removeClass('active');
-    $(`#tab${tabNumber}-btn`).addClass('active');
-
-    $('.tab-pane').removeClass('show active');
-    $(`#tab${tabNumber}`).addClass('show active');
-}
-
-window.showPopup = function (title, content) {
-
-    var event = window.event;
-    var clickedElement = event.target;
-    var row = clickedElement.closest('tr');
-
-    var date = row.querySelector('#news-date').textContent;
-    var time = row.querySelector('#news-time').textContent;
-
-    document.querySelector('.modal-body .date').textContent = date;
-    document.querySelector('.modal-body .time').textContent = time;
 
 
-    $('.modal-news-title').text(title);
-    $('#popup-content').html(content);
-
-    setTimeout(function () {
-        document.getElementById('popup-content').scrollTop = 0;
-    }, 10);
-
-    $('#overlay').fadeIn();
-    $('#newsModal').fadeIn();
-}; 
 
 let categoryGrid = document.querySelector(".category-grid");
 categoryGrid.innerHTML = ""; // Clear previous rows

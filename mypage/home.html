@@ -539,17 +539,7 @@
         
         $(document).ready(function () {
 
-            $(".category-model-open").click(function () {
-            console.log("Category model open clicked");
-        $("#categoryModel").fadeIn(300); // 300ms animation
-        $("#CategoryOverlay").fadeIn(300); // 300ms animation
-        });     
-        
-           // Close the modal with fade out
-    $("#closeBtn, #closeModalBtn").click(function () {
-        $("#categoryModel").fadeOut(300); // 300ms animation
-        $("#CategoryOverlay").fadeOut(300); // 300ms animation
-    });
+           
             // Highlight active navigation link
             let currentPage = window.location.pathname.split("/").pop();
             $(".nav-list .nav-link").removeClass("active-nav");
