@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css" />
     <link rel="stylesheet" href="../css/style.css" />
     <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/leftmenu.js" defer></script>
+
 </head>
 <body>
     <!-- header -->
@@ -577,8 +579,11 @@
             $('#overlay').fadeIn();
             $('#newsModal').fadeIn();
         }; 
+        $('#closeModal, #closeModalBtn').on('click', function () {
+            $('#overlay').fadeOut();
+            $('#newsModal').fadeOut();
+        });
     </script>
-        <script src="../js/leftmenu.js"></script>
 
 </body>
 

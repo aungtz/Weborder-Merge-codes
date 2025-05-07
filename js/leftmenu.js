@@ -364,17 +364,7 @@ function hideTooltip(el) {
 
 $(document).ready(function () {
     // categoryModel
-    $(".category-model-open").click(function () {
-        console.log("Category model open clicked");
-    $("#categoryModel").fadeIn(300); // 300ms animation
-    $("#CategoryOverlay").fadeIn(300); // 300ms animation
-    });     
-    
-       // Close the modal with fade out
-$("#closeBtn, #closeModalBtn").click(function () {
-    $("#categoryModel").fadeOut(300); // 300ms animation
-    $("#CategoryOverlay").fadeOut(300); // 300ms animation
-});
+  
     //csv modal 
     $(document).on("click", "#CSV-popup", function () {
         $(" #CSVmodal").fadeIn();
@@ -656,32 +646,7 @@ function hideTooltipCategory() {
         display.textContent = names.length > 0 ? names.join("、") : "未選択";
     }
 
-    let checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.value = category.category_code;
-    checkbox.dataset.name = category.category_name; // for easy access later
-
-// Maintain checkbox state on redraw
-    let isSelected = selectedCategories.find(c => c.code === category.category_code);
-    if (isSelected) checkbox.checked = true;
-
-// Checkbox change handler
-checkbox.addEventListener('change', function () {
-    const code = this.value;
-    const name = this.dataset.name;
-
-    if (this.checked) {
-        // Add to array if not already there
-        if (!selectedCategories.some(c => c.code === code)) {
-            selectedCategories.push({ name, code });
-        }
-    } else {
-        // Remove from array
-        selectedCategories = selectedCategories.filter(c => c.code !== code);
-    }
-
-    updateSelectedCategoriesDisplay();
-});
+   
 updateSelectedCategoriesDisplay();
 
   
